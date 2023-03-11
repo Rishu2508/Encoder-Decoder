@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Encoder | Decoder Made by Rishu</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<style type="text/css">
+		@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+		*{
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		body{
+			--bg: #fff;
+			--bg-dark: #242424;
+			--txt-color: #000;
+			--field-bg: #fff;
+			--field-color: #000;
+			--opt-bg: #fffd;
+			--opt-color: #333;
+			--shift-bg: #bbb3;
+			background: var(--bg-dark);
+			font-family: 'Poppins', sans-serif;
+			transition: all 1s;
+		}
+		body.dark{
+			/*--bg: #242424;*/
+			--txt-color: #fff;
+			--field-bg: #0005;
+			--field-color: #fff5;
+			--opt-bg: #fff3;
+			--opt-color: #fff9;
+		}
+		.container{
+			width: 60vw;
+			height: 100vh;
+			background: var(--bg);
+			margin: 0 auto;
+			display: flex;
+			flex-direction: column;
+			padding: 2rem;
+			position: relative;
+		}
+		.dark-ui{
+			display: flex;
+    		align-items: flex-end;
+		}
+		.dark-ui .icon{
+			cursor: pointer;
+		    border: 1px solid #0005;
+		    padding: 0.2rem 1.4rem;
+		    border-radius: 8px;
+		    display: flex;	
+		    background: radial-gradient(transparent, #8992f945);	
+		}
+		body.dark .dark-ui .icon{
+			border-color: #fff5;
+			background: radial-gradient(transparent, #ffd43b26);
+		}
+		.theme{
+			display: none;
+		}
+		.theme.active{
+			display: initial;
+		}
+		.fa-moon{
+			color: #8992f9;
+		}
+		.fa-sun-bright{
+			color: #ffd43b;
+		}
+		.heading h1 span {
+			display: inline-block;
+			color: red;
+			position: relative;
+		}
+		.heading h1 span.pulse{
+			color: var(--txt-color);
+			animation: pulse 1.5s 1 ease normal forwards;
+		}
+		.heading h1 span:not(.pulse)::after{
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: var(--bg);
+			transition: 0.3s;
+			animation: slide 2s 1s 1 ease normal forwards;
+		}
+		.heading h1 span:first-child::after{
+			transform-origin: left center;}
+		.heading h1 span:last-child::after{
+			transform-origin: right center;}
+		.heading{
+			height: auto;
+			display: block;
+			text-align: center;
+			margin-bottom: 1rem;
+		}
+		.button-group{
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			padding: 0 1rem;
+		}
+		.direction-btn{
+			display: flex;
+			align-items: center;
+		}
+		.shift-control{
+			display: none;
+		}
+		.button-group label span{
+			background: lightblue;
+			padding: 0.5rem 1rem;
+			margin: 0 0.5rem;
+			cursor: pointer;
+			border-radius: 6px;
+		}
+		.button-group label input:not(:checked) ~ span:hover{
+			background: #6ac2df;
+		}
+		input:checked ~ span {
+			background: #0288d1;
+			color: white;
+			box-shadow: 3px 3px 8px -1px #0003;
+		}
+		.button-group label[for="shift"],label[for="result"]{
+			color: var(--txt-color);
+		}
+		.button-group #shift{
+			width: 100px;
+		    padding: 0.24em;
+		    font-family: inherit;
+		    font-size: 1.1rem;
+		    border-radius: 6px;
+		    border: 1px solid #0006;
+		    background: var(--shift-bg);
+		    color: var(--txt-color);
+		    margin-right: 1rem;
+		}
+		.button-group #shift:focus{
+			outline: none;
+		}
+		button#process{
+			font-family: inherit;
+			padding: 0.4rem 1.5rem;
+			outline: none;
+			border: 1px solid transparent;
+			background: #1fd335;
+			color: white;
+			border-radius: 6px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+		button#process:hover{
+			background: #1ba72c;
+		}
+		.textarea{
+			padding: 1rem 0.5rem;
+			position: relative;
+		}
+		.textarea textarea{
+			width: 100%;
+			height: 25vh;
+			font-family: inherit;
+			border: 1px solid #0003;
+			border-radius: 8px;
+			box-shadow: 5px 5px 5px -3px #0003;
+			background: var(--field-bg);
+			color: var(--field-color);
+			font-size: 1.4rem;
+			padding: 0.5rem 5rem 0.5rem 0.5rem;
+		}
+		.textarea textarea:focus{
+			outline: none;
+			border-color: #0008;
+		}
+		.textarea>label{
+			color: var(--txt-color);
+			display: block;
+			font-size: 1.2rem;
+			padding: 0 0 0.5rem 1rem; 
+		}
+		.textarea .options{
+			background: #00304900;
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			padding: 8px;
+			border-radius: 6px;
+			opacity: 0;
+			visibility: hidden;
+		}
+		.input-field{
+			position: relative;
+		}
+		.options.second{
+			top: 16px;
+		}
+		.textarea textarea:hover + .options.first,.options:hover {
+			opacity: 1;
+			visibility: visible;
+		}
+		.textarea textarea:hover + .options.second {
+			opacity: 1;
+			visibility: visible;
+		}
+		
+		.option{
+			width: 40px;
+			height: 40px;
+			margin: 0.2rem;
+			background: var(--opt-bg);
+			border-radius: 50%;
+			color: var(--opt-color);
+			font-size: 1.3rem;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			box-shadow: 2px 2px 6px 1px #0002;
+			cursor: pointer;
+			position: relative;
+		}
+		.option::after{
+			position: absolute;
+			top: 50%;
+			left: -60%;
+			transform: translateY(-50%);
+			font-size: 0.8rem;
+			opacity: 0;
+			transition: 0.2s;
+			color: currentColor;
+			padding: 5px;
+		}
+		.option:first-child::after{
+			content: 'copy';	
+		}
+		.option:last-child::after{
+			content: 'paste';
+		}
+		.option:hover::after{
+			left: -110%;
+			opacity: 1;
+		}
+		@keyframes pulse {
+			from{opacity: 0;}
+			to{opacity: 1;}
+		}
+
+		@keyframes slide {
+			from{
+				transform: skew(-10deg) scaleX(1.0);
+			}
+			to{
+				transform: skew(-10deg) scaleX(0);
+			}
+		}
+		@media (prefers-color-scheme: dark) {
+		  body.dark{
+	  			--bg: #242424;
+	  			--txt-color: #fff;
+	  			--field-bg: #0005;
+	  			--field-color: #fff5;
+	  			--opt-bg: #fff3;
+	  			--opt-color: #fff9;
+	  		}
+		}
+		@media (max-width: 1200px) {
+			.container{
+				width: 70vw;
+			}
+		}
+		@media (max-width: 1024px) {
+			.container{
+				width: 80vw;
+			}
+		}
+		@media (max-width: 830px) {
+			.container{
+				width: 90vw;
+			}
+		}
+		@media (max-width: 740px) {
+			.container{
+				width: 100vw;
+				padding: 1rem;
+			}
+			.heading{
+				margin: 1rem 0;
+			}
+			.shift-control{
+				display: initial;
+				position: relative;
+				margin: 0 0.2rem;
+			}
+			.other-controls label, .other-controls #shift.control{
+				display: none;
+			}
+			.textarea textarea{
+				font-size: 1.2rem;
+			}
+			.dark-ui {
+			    position: absolute;
+			    bottom: 16px;
+			    right: 16px;
+			}
+			.dark-ui .icon {
+			    padding: 0.7rem;
+			}
+			.direction-btn{
+				margin: 1.2rem 0;
+				justify-content: center;
+			}
+			.other-controls{
+				display: flex;
+				justify-content: center;
+			}
+			.layout{
+				display: flex;
+				flex-direction: column-reverse;
+			}
+			.dark-ui .icon {
+			    padding: 0.7rem;
+			}
+			.button-group{
+				justify-content: center;
+				flex-direction: column;
+			}
+/*			.button-group label span {
+			    padding: 0.4rem 0.8rem;
+			    margin: 0 0.2rem;
+			}*/
+			.button-group #shift{
+				margin: 0;
+			}
+			.button-group label[for="shift"] {
+			    position: absolute;
+			    top: -1.5rem;
+			}
+		}
+		@media (max-width: 600px) {
+			.button-group label span {
+			    padding: 0.4rem 0.8rem;
+			    margin: 0 0.2rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		
+		<div class="heading">
+			<h1>
+				<span>Encoder</span>
+				<span class="pulse">/</span>
+				<span>Decoder</span></h1>
+		</div>
+		<div class="layout">
+			<div class="button-group">
+				<div class="direction-btn">
+					<label for="encode">
+						<input type="radio" id="encode" name="direction" class="direction" hidden>
+						<span>Encode</span>
+					</label>
+					<label for="decode">
+						<input type="radio" id="decode" name="direction" class="direction" hidden checked>
+						<span>Decode</span>
+					</label>
+					<div class="shift-control">
+						<label for="shift">Shift:</label>
+						<input type="number" min="1" value="1" id="shift" class="btn-grp">
+					</div>
+				</div>
+				<div class="dark-ui" title="Change theme">
+					<div class="icon">
+						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="moon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="theme active svg-inline--fa fa-moon fa-fw fa-xl"><path fill="currentColor" d="M32 256c0-123.8 100.3-224 223.8-224c11.36 0 29.7 1.668 40.9 3.746c9.616 1.777 11.75 14.63 3.279 19.44C245 86.5 211.2 144.6 211.2 207.8c0 109.7 99.71 193 208.3 172.3c9.561-1.805 16.28 9.324 10.11 16.95C387.9 448.6 324.8 480 255.8 480C132.1 480 32 379.6 32 256z" class=""></path></svg>
+						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sun-bright" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="theme svg-inline--fa fa-sun-bright fa-fw fa-xl"><path fill="currentColor" d="M120.2 154.2c4.672 4.688 10.83 7.031 16.97 7.031S149.5 158.9 154.2 154.2c9.375-9.375 9.375-24.56 0-33.93L108.9 74.97c-9.344-9.375-24.56-9.375-33.94 0s-9.375 24.56 0 33.94L120.2 154.2zM256 112c13.25 0 24-10.75 24-24v-64C280 10.75 269.3 0 256 0S232 10.75 232 24v64C232 101.3 242.8 112 256 112zM112 256c0-13.25-10.75-24-24-24h-64C10.75 232 0 242.8 0 256s10.75 24 24 24h64C101.3 280 112 269.3 112 256zM374.8 161.2c6.141 0 12.3-2.344 16.97-7.031l45.25-45.28c9.375-9.375 9.375-24.56 0-33.94s-24.59-9.375-33.94 0l-45.25 45.28c-9.375 9.375-9.375 24.56 0 33.93C362.5 158.9 368.7 161.2 374.8 161.2zM256 400c-13.25 0-24 10.75-24 24v64C232 501.3 242.8 512 256 512s24-10.75 24-24v-64C280 410.8 269.3 400 256 400zM120.2 357.8l-45.25 45.28c-9.375 9.375-9.375 24.56 0 33.94c4.688 4.688 10.83 7.031 16.97 7.031s12.3-2.344 16.97-7.031l45.25-45.28c9.375-9.375 9.375-24.56 0-33.93S129.6 348.4 120.2 357.8zM488 232h-64c-13.25 0-24 10.75-24 24s10.75 24 24 24h64C501.3 280 512 269.3 512 256S501.3 232 488 232zM391.8 357.8c-9.344-9.375-24.56-9.372-33.94 .0031s-9.375 24.56 0 33.93l45.25 45.28c4.672 4.688 10.83 7.031 16.97 7.031s12.28-2.344 16.97-7.031c9.375-9.375 9.375-24.56 0-33.94L391.8 357.8zM256 144C194.1 144 144 194.1 144 256c0 61.86 50.14 112 112 112s112-50.14 112-112C368 194.1 317.9 144 256 144z" class=""></path></svg>
+					</div>
+				</div>
+				<div class="other-controls">
+					<label for="shift">Shift:</label>
+					<input type="number" min="1" value="1" id="shift"class="control">
+
+					<button id="process" >Process</button>
+				</div>
+				
+			</div>
+			<div class="textarea">
+				<div class="input-field">
+					<textarea rows="4" cols="50" wrap="hard" placeholder="Your text goes here" id="input"></textarea>
+					<div class="options first">
+							<div class="option copy"><i class="fa-solid fa-copy"></i></div>
+							<div class="option paste"><i class="fa-solid fa-paste"></i></div>
+					</div>
+				</div>
+				<div class="input-field">
+					<label for="result">Result:</label>
+					<textarea rows="4" cols="50" wrap="hard" placeholder="Encoded output" id="result"></textarea>
+					<div class="options second">
+							<div class="option copy"><i class="fa-solid fa-copy"></i></div>
+							<div class="option paste"><i class="fa-solid fa-paste"></i></div>
+					</div>
+				</div>		
+			</div>
+		</div>		
+	</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		var alphabets = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+		var direction = $('input:checked + span').text().toLowerCase();
+		$('#input').val("j mpwf zpv");
+
+
+		function caeser(text,shift_amount,direction){
+			txt = ""
+			position = 0
+			new_position = 0
+
+			// console.log(text,shift_amount,direction);
+			for (var i = 0; i < text.length; i++) {
+				if(!alphabets.includes(text[i]))
+				{
+					txt += text[i];
+				}
+				else if (direction == 'encode')
+				{
+					position = alphabets.indexOf(text[i]);
+					new_position = position + shift_amount;
+					txt += alphabets[new_position];
+				}
+				else if (direction == 'decode')
+				{
+					position = alphabets.indexOf(text[i]) || alphabets.length;
+					new_position = position - shift_amount;
+					txt += alphabets[new_position];			
+				}
+			}
+			
+			$('#result').val(txt);			
+		}
+
+		function copyToClipboard(elm,text) {
+			elm.select();
+			navigator.clipboard.writeText(text);
+		}
+
+
+		$('.copy').click(function(){
+			if($(this).parent().hasClass('second')){
+				var text = $('#result').val();
+				copyToClipboard($('#result'),text);
+			}else{
+				var text = $('#input').val();
+				copyToClipboard($('#input'),text);
+			}
+		})
+
+		$('.paste').click(function(){
+			if($(this).parent().hasClass('second')){
+				$('#result').val("");
+				navigator.clipboard.readText().then(
+				clipText => $('#result').val(clipText));
+			}else{
+				$('#input').val("");
+				navigator.clipboard.readText().then(
+				clipText => $('#input').val(clipText));
+			}
+		})
+
+		$('#encode').click(function(){
+			$('#result').attr('placeholder','Encoded Output');
+			direction = $('#encode + span').text().toLowerCase();
+		})
+		$('#decode').click(function(){
+			$('#result').attr('placeholder','Decoded Output');
+			direction = $('#decode + span').text().toLowerCase();
+		})
+		$('button#process').click(function(){
+			var text = $('textarea#input').val().toLowerCase().split(''),
+				shift = parseInt($('#shift').val());
+			console.log(text.join(''),direction,shift)
+			caeser(text,shift,direction);
+
+		})
+
+		const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+
+		if (darkThemeMq.matches) {
+			$('.theme').toggleClass('active');
+			$('body').toggleClass('dark');
+		}
+
+		$('.dark-ui .icon').click(function(){
+			$('.theme').toggleClass('active');
+			$('body').toggleClass('dark');
+		})
+	})
+</script>
+</body>
+</html>
